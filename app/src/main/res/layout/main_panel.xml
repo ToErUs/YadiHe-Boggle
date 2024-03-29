@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/instruction_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter a word then hit submit."
+        android:textSize="20sp"
+        android:gravity="center"/>
+
+    <LinearLayout
+        android:id="@+id/button_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+        <!-- Buttons will be added dynamically here -->
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/current_word_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="current_word_text"
+        android:textSize="32sp"
+        android:gravity="center"/>
+
+    <LinearLayout
+        android:id="@+id/button_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <!-- Clear Button -->
+        <Button
+            android:id="@+id/button_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clear"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_marginEnd="8dp"/>
+
+        <!-- Submit Button -->
+        <Button
+            android:id="@+id/button_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Submit"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>
