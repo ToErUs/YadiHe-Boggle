@@ -13,11 +13,25 @@ import com.example.yadihe_boggle.databinding.MainPanelBinding
 
 interface MainPanelCommunicator {
     fun getLetterArray(): Array<CharArray>
+    fun clickButton(row: Int,col: Int)
+
+    fun getEnabledButtons():MutableList<Pair<Int, Int>>
+
+    fun getCurrWord():String
+
+    fun submit()
+
+    fun updateScore()
+
+    fun clear()
+
+
 
 }
 class MainPanelFragment: Fragment() {
     private lateinit var binding: MainPanelBinding
     private var activityListener: MainPanelCommunicator? = null
+    val SIZE_OF_GAME=4
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,6 +46,15 @@ class MainPanelFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         inflateButtonArray()
+        binding.buttonSubmit.setOnClickListener{
+            activityListener?.submit()
+            updateUI()
+            activityListener?.updateScore()
+        }
+        binding.buttonClear.setOnClickListener{
+            activityListener?.clear()
+            updateUI()
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -68,6 +91,10 @@ class MainPanelFragment: Fragment() {
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     )
+                    button.setOnClickListener {
+                        // Call the buttonClicked function with the coordinates of the clicked button
+                        buttonClicked(row, col)
+                    }
 
                     // Add the Button to the rowLayout
                     rowLayout.addView(button)
@@ -77,6 +104,45 @@ class MainPanelFragment: Fragment() {
                 binding.buttonContainer.addView(rowLayout)
             }
         }
+    }
+
+    private fun buttonClicked(row: Int, col: Int) {
+        activityListener?.clickButton(row,col)
+        updateUI()
+    }
+
+    fun updateUI(){
+        inflateButtonArray()
+        updateEnabledButtons()
+        updateCurrWord()
+    }
+
+    fun updateEnabledButtons(){
+        val enabledButtons:MutableList<Pair<Int, Int>> = activityListener?.getEnabledButtons() ?: mutableListOf()
+        for (row in 0 until SIZE_OF_GAME) {
+            // Iterate over each letter in the row
+            for (col in 0 until SIZE_OF_GAME) {
+                // Find the button at the current coordinates (row, col)
+                val button = findButton(row, col)
+
+                // Enable or disable the button based on its coordinates in the enabledButtons list
+                val isEnabled = Pair(row, col) in enabledButtons
+                button.isEnabled = isEnabled
+            }
+        }
+    }
+
+    fun updateCurrWord(){
+        binding.currentWordText.text= activityListener?.getCurrWord() ?: "non"
+    }
+
+    private fun findButton(row: Int, col: Int): Button {
+        // Calculate the index of the button in the buttonContainer
+        val index = row * SIZE_OF_GAME + col
+
+        // Get the button at the calculated index
+        val rowLayout = binding.buttonContainer.getChildAt(row) as LinearLayout
+        return rowLayout.getChildAt(col) as Button
     }
 
 

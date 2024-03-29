@@ -1,12 +1,17 @@
 package com.example.yadihe_boggle
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import kotlin.contracts.contract
 import kotlin.random.Random
+
 
 private const val TAG = "BoggleViewModel"
 class BoggleViewModel : ViewModel() {
+
     val SIZE_OF_GAME=4
     val letterArray = Array(SIZE_OF_GAME) { CharArray(SIZE_OF_GAME) }
     val buttonsHit: MutableList<Pair<Int, Int>> = mutableListOf()
@@ -43,7 +48,7 @@ class BoggleViewModel : ViewModel() {
     }
 
     fun getCurrentWord():String{
-        return getStringFromButtonsHit(buttonsUsed)
+        return getStringFromButtonsHit(buttonsHit)
     }
     fun getCurrentScore():Int{
         return score
@@ -54,7 +59,7 @@ class BoggleViewModel : ViewModel() {
             wordsSubmitted.add(currentWord)
             val addScore=scoreWord(currentWord)
             score+=addScore
-            updateToastMessage("Score +$addScore")
+            updateToastMessage("Correct! Score +$addScore")
             buttonsUsed.addAll(buttonsHit)
             buttonsHit.clear()
             updateEnabledButtons()
@@ -66,6 +71,11 @@ class BoggleViewModel : ViewModel() {
         }
     }
 
+    fun hitButton(row:Int, col:Int){
+        buttonsHit.add(Pair(row,col))
+        updateEnabledButtons()
+    }
+
     /**
      * Private Functions:
      */
@@ -73,21 +83,46 @@ class BoggleViewModel : ViewModel() {
         _toastMessage.value = message
     }
     private fun scoreWord(word: String):Int{
-        return 1
+        var s=0;
+        s+=(word.length-countVowels(word))
+        s+=5*countVowels(word)
+        if(containsSpecialCharacters(word)){
+            s*=2
+        }
+        return s
     }
     private fun checkWord(word:String):Boolean{
+        if(word in wordsSubmitted){
+            updateToastMessage("You cannot submit the same word twice.")
+            return false
+        }
+        if(word.length<4){
+            updateToastMessage("Words must be at least 4 chars long.")
+            return false
+        }
+        if(countVowels(word)<2){
+            updateToastMessage("Words must contain at least two vowels.")
+            return false
+        }
         return true
+    }
+
+    fun submitWrongWord(){
+        score-=10
+        updateToastMessage("Incorrect! Score -10")
+        buttonsHit.clear()
+        updateEnabledButtons()
     }
 
     /**
      * Extract the current word from buttonsHit
      */
     private fun getStringFromButtonsHit(buttonsHit: List<Pair<Int, Int>>): String {
-        val stringBuilder = StringBuilder()
+        var s=""
         for ((row, col) in buttonsHit) {
-            stringBuilder.append("$row$col")
+            s+=(letterArray[row][col])
         }
-        return stringBuilder.toString()
+        return s
     }
 
     /**
@@ -96,13 +131,14 @@ class BoggleViewModel : ViewModel() {
      */
     private fun fillLetterArray(letterArray: Array<CharArray>) {
 
-        val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        val alphabet = "AAAABBCCCCDDDEEEEEEEFFFGGGHIIIIIJJJKKLLLMNNNOOOOPQRRRRSSSSTTTTUUVVWWXXYYYZ"
         for (i in letterArray.indices) {
             for (j in letterArray[i].indices) {
                 val randomIndex = Random.nextInt(0, alphabet.length)
                 letterArray[i][j] = alphabet[randomIndex]
             }
         }
+        Log.d("ViewModel", "Set to new letter array")
     }
 
 
@@ -119,6 +155,7 @@ class BoggleViewModel : ViewModel() {
             }
         }else{
             // Add all positions adjacent to the last hit button to enabledButtons
+            enabledButtons.clear()
             val lastHit = buttonsHit.last()
             val (lastHitRow, lastHitCol) = lastHit
             for (rowOffset in -1..1) {
@@ -134,5 +171,30 @@ class BoggleViewModel : ViewModel() {
         }
         enabledButtons.removeAll { it in buttonsHit || it in buttonsUsed }
     }
+    fun countVowels(input: String): Int {
+        val vowels = setOf('A', 'E', 'I', 'O', 'U')
+        var count = 0
+
+        for (char in input) {
+            if (char in vowels) {
+                count++
+            }
+        }
+
+        return count
+    }
+
+    fun containsSpecialCharacters(input: String): Boolean {
+        val specialCharacters = setOf('S', 'Z', 'P', 'X', 'Q')
+
+        for (char in input) {
+            if (char in specialCharacters) {
+                return true
+            }
+        }
+
+        return false
+    }
+
 
 }

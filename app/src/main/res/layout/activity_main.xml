@@ -9,7 +9,7 @@
         android:id="@+id/fragment_container1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="8"/>
+        android:layout_weight="8" />
 
     <!-- Fragment container 2 -->
     <FrameLayout

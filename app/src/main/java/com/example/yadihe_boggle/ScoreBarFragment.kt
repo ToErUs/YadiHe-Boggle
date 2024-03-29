@@ -10,6 +10,7 @@ import com.example.yadihe_boggle.databinding.ScoreBarBinding
 
 interface ScoreBarCommunicator {
     fun getCurrScore(): Int
+    fun startNewGame()
 
 }
 class ScoreBarFragment:Fragment() {
@@ -28,6 +29,9 @@ class ScoreBarFragment:Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         updateScoreUI()
+        binding.newGameButton.setOnClickListener {
+            activityListener?.startNewGame()
+        }
     }
 
     override fun onAttach(context: Context) {
